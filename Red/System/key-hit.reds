@@ -22,14 +22,17 @@ Red/System [
 	]
 ]
 
-#import [
-	LIBC-file cdecl [
-		_kbhit: "_kbhit" [ return: [integer!] ]
-		_getch: "_getch" [ return: [integer!] ]
+#import [LIBC-file cdecl [
+	#either OS = 'Windows [
+		kbhit:   "_kbhit" [ return: [integer!] ]
+		getchar: "_getch" [ return: [integer!] ]
+	][
+		kbhit:   "kbhit"   [ return: [integer!] ]
+		getchar: "getchar" [ return: [integer!] ]
 	]
-]
+]]
 
-#define key-hit [0 <> _kbhit]
-#define key-hit-char _getch
+#define key-hit [0 <> kbhit]
+#define key-hit-char getchar
 		
 	
