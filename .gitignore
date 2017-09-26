@@ -1,4 +1,5 @@
 build/*
+!build/README.md
 tools/*
 * - Copy*
 desktop.ini
