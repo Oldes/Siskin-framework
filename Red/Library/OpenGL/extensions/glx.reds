@@ -94,7 +94,6 @@ This source was made from glxew.h file, which contains these copyrights:
 
 ;@@ some of these should be in shared definitions for Linux
 
-#define Colormap!                    handle!
 #define GLXContext!                  handle!
 #define GLXContextID!                handle!
 #define GLXDrawable!                 handle!
@@ -105,11 +104,13 @@ This source was made from glxew.h file, which contains these copyrights:
 #define GLXVideoCaptureDeviceNV!     handle!
 #define GLXVideoDeviceNV!            handle!
 #define GLXWindow!                   handle!
-#define Pixmap!                      handle!
-#define Status!                      handle!
-#define Window!                      handle!
+#define XColormap!                   handle!
+#define XPixmap!                     handle!
+#define XStatus!                     handle!
+#define XWindow!                     handle!
+#define XFont!                       handle!
+#define XDisplay!                    handle!
 
-#define Display-ptr!                 handle-ptr!
 #define GLXFBConfig-ptr!             handle-ptr!
 #define GLXFBConfigSGIX-ptr!         handle-ptr!
 #define GLXHyperpipeConfigSGIX-ptr!  handle-ptr!
@@ -151,6 +152,87 @@ This source was made from glxew.h file, which contains these copyrights:
 #define  GLX_BAD_VALUE                                6
 #define  GLX_BAD_ENUM                                 7
 
+#import [ GL_LIBRARY GL_CALLING [
+	glXQueryExtension: "glXQueryExtension"[
+		dpy         [ XDisplay! ]
+		errorBase   [ pointer! [integer!] ]
+		eventBase   [ pointer! [integer!] ]
+		return:     [ logic! ]
+	]
+	glXQueryVersion: "glXQueryVersion"[
+		dpy         [ XDisplay! ]
+		major       [ pointer! [integer!] ]
+		minor       [ pointer! [integer!] ]
+		return:     [ logic! ]
+	]
+	glXGetConfig: "glXGetConfig"[
+		dpy         [ XDisplay! ]
+		vis         [ XVisualInfo-ptr! ]
+		attrib      [ integer! ]
+		value       [ pointer! [integer!] ]
+		return:     [ integer! ]
+	]
+	glXChooseVisual: "glXChooseVisual"[
+		dpy         [ XDisplay! ]
+		screen      [ integer! ]
+		attribList  [ pointer! [integer!] ]
+		return:     [ XVisualInfo-ptr! ]
+	]
+	glXCreateGLXPixmap: "glXCreateGLXPixmap"[
+		dpy         [ XDisplay! ]
+		vis         [ XVisualInfo-ptr! ]
+		pixmap      [ XPixmap! ]
+		return:     [ GLXPixmap! ]
+	]
+	glXDestroyGLXPixmap: "glXDestroyGLXPixmap"[
+		dpy         [ XDisplay! ]
+		pix         [ GLXPixmap! ]
+	]
+	glXCreateContext: "glXCreateContext"[
+		dpy         [ XDisplay! ]
+		vis         [ XVisualInfo-ptr! ]
+		shareList   [ GLXContext! ]
+		direct      [ logic! ]
+		return:     [ GLXContext! ]
+	]
+	glXDestroyContext: "glXDestroyContext"[
+		dpy         [ XDisplay! ]
+		ctx         [ GLXContext! ]
+	]
+	glXIsDirect: "glXIsDirect"[
+		dpy         [ XDisplay! ]
+		ctx         [ GLXContext! ]
+		return:     [ logic! ]
+	]
+	glXCopyContext: "glXCopyContext"[
+		dpy         [ XDisplay! ]
+		src         [ GLXContext! ]
+		dst         [ GLXContext! ]
+		mask        [ GLuint! ]
+	]
+	glXMakeCurrent: "glXMakeCurrent"[
+		dpy         [ XDisplay! ]
+		drawable    [ GLXDrawable! ]
+		ctx         [ GLXContext! ]
+		return:     [ logic! ]
+	]
+	glXGetCurrentContext: "glXGetCurrentContext" [ return: [GLXContext!] ]
+	glXGetCurrentDrawable: "glXGetCurrentDrawable" [ return: [GLXDrawable!] ]
+	glXWaitGL: "glXWaitGL" [ ]
+	glXWaitX: "glXWaitX" [ ]
+	glXSwapBuffers: "glXSwapBuffers"[
+		dpy         [ XDisplay! ]
+		drawable    [ GLXDrawable! ]
+	]
+	glXUseXFont: "glXUseXFont"[
+		font        [ Font! ]
+		first       [ integer! ]
+		count       [ integer! ]
+		listBase    [ integer! ]
+	]
+]]
+
+
 
 ;-------------------------------------------
 ;-- GLX_VERSION_1_1
@@ -161,6 +243,26 @@ This source was made from glxew.h file, which contains these copyrights:
 #define  GLX_VERSION                                  02h
 #define  GLX_EXTENSIONS                               03h
 
+#import [ GL_LIBRARY GL_CALLING [
+	glXQueryExtensionsString: "glXQueryExtensionsString"[
+		dpy         [ XDisplay! ]
+		screen      [ integer! ]
+		return:     [ c-string! ]
+	]
+	glXGetClientString: "glXGetClientString"[
+		dpy         [ XDisplay! ]
+		name        [ integer! ]
+		return:     [ c-string! ]
+	]
+	glXQueryServerString: "glXQueryServerString"[
+		dpy         [ XDisplay! ]
+		screen      [ integer! ]
+		name        [ integer! ]
+		return:     [ c-string! ]
+	]
+]]
+
+
 
 ;-------------------------------------------
 ;-- GLX_VERSION_1_2
@@ -168,7 +270,7 @@ This source was made from glxew.h file, which contains these copyrights:
 
 #define  GLX_VERSION_1_2                              1
 glXGetCurrentDisplay!: alias function! [
-	return: [ Display-ptr! ]
+	return: [ XDisplay! ]
 ]
 
 
@@ -234,14 +336,14 @@ glXGetCurrentDisplay!: alias function! [
 #define  GLX_PBUFFER_CLOBBER_MASK                     08000000h
 #define  GLX_DONT_CARE                                FFFFFFFFh
 glXChooseFBConfig!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	screen      [ integer! ]
 	attrib_list [ pointer! [integer!] ]
 	nelements   [ pointer! [integer!] ]
 	return: [ GLXFBConfig-ptr! ]
 ]
 glXCreateNewContext!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	config      [ GLXFBConfig! ]
 	render_type [ integer! ]
 	share_list  [ GLXContext! ]
@@ -249,85 +351,85 @@ glXCreateNewContext!: alias function! [
 	return: [ GLXContext! ]
 ]
 glXCreatePbuffer!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	config      [ GLXFBConfig! ]
 	attrib_list [ pointer! [integer!] ]
 	return: [ GLXPbuffer! ]
 ]
 glXCreatePixmap!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	config      [ GLXFBConfig! ]
-	pixmap      [ Pixmap! ]
+	pixmap      [ XPixmap! ]
 	attrib_list [ pointer! [integer!] ]
 	return: [ GLXPixmap! ]
 ]
 glXCreateWindow!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	config      [ GLXFBConfig! ]
-	win         [ Window! ]
+	win         [ XWindow! ]
 	attrib_list [ pointer! [integer!] ]
 	return: [ GLXWindow! ]
 ]
 glXDestroyPbuffer!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	pbuf    [ GLXPbuffer! ]
 ]
 glXDestroyPixmap!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	pixmap  [ GLXPixmap! ]
 ]
 glXDestroyWindow!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	win     [ GLXWindow! ]
 ]
 glXGetCurrentReadDrawable!: alias function! [
 	return: [ GLXDrawable! ]
 ]
 glXGetFBConfigAttrib!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	config    [ GLXFBConfig! ]
 	attribute [ integer! ]
 	value     [ pointer! [integer!] ]
 	return: [ integer! ]
 ]
 glXGetFBConfigs!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	screen    [ integer! ]
 	nelements [ pointer! [integer!] ]
 	return: [ GLXFBConfig-ptr! ]
 ]
 glXGetSelectedEvent!: alias function! [
-	dpy        [ Display-ptr! ]
+	dpy        [ XDisplay! ]
 	draw       [ GLXDrawable! ]
 	event_mask [ pointer! [integer!] ]
 ]
 glXGetVisualFromFBConfig!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	config  [ GLXFBConfig! ]
 	return: [ XVisualInfo-ptr! ]
 ]
 glXMakeContextCurrent!: alias function! [
-	display [ Display-ptr! ]
+	display [ XDisplay! ]
 	draw    [ GLXDrawable! ]
 	read    [ GLXDrawable! ]
 	ctx     [ GLXContext! ]
 	return: [ logic! ]
 ]
 glXQueryContext!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	ctx       [ GLXContext! ]
 	attribute [ integer! ]
 	value     [ pointer! [integer!] ]
 	return: [ integer! ]
 ]
 glXQueryDrawable!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	draw      [ GLXDrawable! ]
 	attribute [ integer! ]
 	value     [ pointer! [integer!] ]
 ]
 glXSelectEvent!: alias function! [
-	dpy        [ Display-ptr! ]
+	dpy        [ XDisplay! ]
 	draw       [ GLXDrawable! ]
 	event_mask [ integer! ]
 ]
@@ -438,7 +540,7 @@ glXMakeAssociatedContextCurrentAMD!: alias function! [
 #define  GLX_CONTEXT_MINOR_VERSION_ARB                2092h
 #define  GLX_CONTEXT_FLAGS_ARB                        2094h
 glXCreateContextAttribsARB!: alias function! [
-	dpy           [ Display-ptr! ]
+	dpy           [ XDisplay! ]
 	config        [ GLXFBConfig! ]
 	share_context [ GLXContext! ]
 	direct        [ logic! ]
@@ -581,17 +683,17 @@ glXCreateContextAttribsARB!: alias function! [
 #define  GLX_BIND_TO_TEXTURE_LUMINANCE_ATI            9821h
 #define  GLX_BIND_TO_TEXTURE_INTENSITY_ATI            9822h
 glXBindTexImageATI!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	pbuf    [ GLXPbuffer! ]
 	buffer  [ integer! ]
 ]
 glXDrawableAttribATI!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	draw        [ GLXDrawable! ]
 	attrib_list [ pointer! [integer!] ]
 ]
 glXReleaseTexImageATI!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	pbuf    [ GLXPbuffer! ]
 	buffer  [ integer! ]
 ]
@@ -647,7 +749,7 @@ glXReleaseTexImageATI!: alias function! [
 #define  GLX_VISUAL_ID_EXT                            800Bh
 #define  GLX_SCREEN_EXT                               800Ch
 glXFreeContextEXT!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	context [ GLXContext! ]
 ]
 glXGetContextIDEXT!: alias function! [
@@ -655,12 +757,12 @@ glXGetContextIDEXT!: alias function! [
 	return: [ GLXContextID! ]
 ]
 glXImportContextEXT!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	contextID [ GLXContextID! ]
 	return: [ GLXContext! ]
 ]
 glXQueryContextInfoEXT!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	context   [ GLXContext! ]
 	attribute [ integer! ]
 	value     [ pointer! [integer!] ]
@@ -701,7 +803,7 @@ glXQueryContextInfoEXT!: alias function! [
 #define  GLX_SWAP_INTERVAL_EXT                        20F1h
 #define  GLX_MAX_SWAP_INTERVAL_EXT                    20F2h
 glXSwapIntervalEXT!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	interval [ integer! ]
 ]
@@ -752,13 +854,13 @@ glXSwapIntervalEXT!: alias function! [
 #define  GLX_AUX8_EXT                                 20EAh
 #define  GLX_AUX9_EXT                                 20EBh
 glXBindTexImageEXT!: alias function! [
-	display     [ Display-ptr! ]
+	display     [ XDisplay! ]
 	drawable    [ GLXDrawable! ]
 	buffer      [ integer! ]
 	attrib_list [ pointer! [integer!] ]
 ]
 glXReleaseTexImageEXT!: alias function! [
-	display  [ Display-ptr! ]
+	display  [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	buffer   [ integer! ]
 ]
@@ -825,7 +927,7 @@ glXGetAGPOffsetMESA!: alias function! [
 
 #define  GLX_MESA_copy_sub_buffer                     1
 glXCopySubBufferMESA!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	x        [ integer! ]
 	y        [ integer! ]
@@ -840,10 +942,10 @@ glXCopySubBufferMESA!: alias function! [
 
 #define  GLX_MESA_pixmap_colormap                     1
 glXCreateGLXPixmapMESA!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	visual  [ XVisualInfo-ptr! ]
-	pixmap  [ Pixmap! ]
-	cmap    [ Colormap! ]
+	pixmap  [ XPixmap! ]
+	cmap    [ XColormap! ]
 	return: [ GLXPixmap! ]
 ]
 
@@ -875,7 +977,7 @@ glXQueryCurrentRendererStringMESA!: alias function! [
 	return: [ c-string! ]
 ]
 glXQueryRendererIntegerMESA!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	screen    [ integer! ]
 	renderer  [ integer! ]
 	attribute [ integer! ]
@@ -883,7 +985,7 @@ glXQueryRendererIntegerMESA!: alias function! [
 	return: [ logic! ]
 ]
 glXQueryRendererStringMESA!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	screen    [ integer! ]
 	renderer  [ integer! ]
 	attribute [ integer! ]
@@ -897,7 +999,7 @@ glXQueryRendererStringMESA!: alias function! [
 
 #define  GLX_MESA_release_buffers                     1
 glXReleaseBuffersMESA!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	d       [ GLXDrawable! ]
 	return: [ logic! ]
 ]
@@ -936,7 +1038,7 @@ glXSwapIntervalMESA!: alias function! [
 
 #define  GLX_NV_copy_buffer                           1
 glXCopyBufferSubDataNV!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	readCtx     [ GLXContext! ]
 	writeCtx    [ GLXContext! ]
 	readTarget  [ GLenum! ]
@@ -946,7 +1048,7 @@ glXCopyBufferSubDataNV!: alias function! [
 	size        [ GLsizeiptr! ]
 ]
 glXNamedCopyBufferSubDataNV!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	readCtx     [ GLXContext! ]
 	writeCtx    [ GLXContext! ]
 	readBuffer  [ GLuint! ]
@@ -963,7 +1065,7 @@ glXNamedCopyBufferSubDataNV!: alias function! [
 
 #define  GLX_NV_copy_image                            1
 glXCopyImageSubDataNV!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	srcCtx    [ GLXContext! ]
 	srcName   [ GLuint! ]
 	srcTarget [ GLenum! ]
@@ -990,7 +1092,7 @@ glXCopyImageSubDataNV!: alias function! [
 
 #define  GLX_NV_delay_before_swap                     1
 glXDelayBeforeSwapNV!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	seconds  [ GLfloat! ]
 	return: [ logic! ]
@@ -1021,14 +1123,14 @@ glXDelayBeforeSwapNV!: alias function! [
 #define  GLX_NV_present_video                         1
 #define  GLX_NUM_VIDEO_SLOTS_NV                       20F0h
 glXBindVideoDeviceNV!: alias function! [
-	dpy          [ Display-ptr! ]
+	dpy          [ XDisplay! ]
 	video_slot   [ integer! ]
 	video_device [ integer! ]
 	attrib_list  [ pointer! [integer!] ]
 	return: [ integer! ]
 ]
 glXEnumerateVideoDevicesNV!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	screen    [ integer! ]
 	nelements [ pointer! [integer!] ]
 	return: [ pointer! [integer!] ]
@@ -1049,39 +1151,39 @@ glXEnumerateVideoDevicesNV!: alias function! [
 
 #define  GLX_NV_swap_group                            1
 glXBindSwapBarrierNV!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	group   [ GLuint! ]
 	barrier [ GLuint! ]
 	return: [ logic! ]
 ]
 glXJoinSwapGroupNV!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	group    [ GLuint! ]
 	return: [ logic! ]
 ]
 glXQueryFrameCountNV!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	screen  [ integer! ]
 	count   [ pointer! [GLuint!] ]
 	return: [ logic! ]
 ]
 glXQueryMaxSwapGroupsNV!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	screen      [ integer! ]
 	maxGroups   [ pointer! [GLuint!] ]
 	maxBarriers [ pointer! [GLuint!] ]
 	return: [ logic! ]
 ]
 glXQuerySwapGroupNV!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	group    [ pointer! [GLuint!] ]
 	barrier  [ pointer! [GLuint!] ]
 	return: [ logic! ]
 ]
 glXResetFrameCountNV!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	screen  [ integer! ]
 	return: [ logic! ]
 ]
@@ -1113,30 +1215,30 @@ glXFreeMemoryNV!: alias function! [
 #define  GLX_UNIQUE_ID_NV                             20CEh
 #define  GLX_NUM_VIDEO_CAPTURE_SLOTS_NV               20CFh
 glXBindVideoCaptureDeviceNV!: alias function! [
-	dpy                [ Display-ptr! ]
+	dpy                [ XDisplay! ]
 	video_capture_slot [ integer! ]
 	device             [ GLXVideoCaptureDeviceNV! ]
 	return: [ integer! ]
 ]
 glXEnumerateVideoCaptureDevicesNV!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	screen    [ integer! ]
 	nelements [ pointer! [integer!] ]
 	return: [ GLXVideoCaptureDeviceNV-ptr! ]
 ]
 glXLockVideoCaptureDeviceNV!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	device  [ GLXVideoCaptureDeviceNV! ]
 ]
 glXQueryVideoCaptureDeviceNV!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	device    [ GLXVideoCaptureDeviceNV! ]
 	attribute [ integer! ]
 	value     [ pointer! [integer!] ]
 	return: [ integer! ]
 ]
 glXReleaseVideoCaptureDeviceNV!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	device  [ GLXVideoCaptureDeviceNV! ]
 ]
 
@@ -1157,21 +1259,21 @@ glXReleaseVideoCaptureDeviceNV!: alias function! [
 #define  GLX_VIDEO_OUT_STACKED_FIELDS_1_2_NV          20CBh
 #define  GLX_VIDEO_OUT_STACKED_FIELDS_2_1_NV          20CCh
 glXBindVideoImageNV!: alias function! [
-	dpy          [ Display-ptr! ]
+	dpy          [ XDisplay! ]
 	VideoDevice  [ GLXVideoDeviceNV! ]
 	pbuf         [ GLXPbuffer! ]
 	iVideoBuffer [ integer! ]
 	return: [ integer! ]
 ]
 glXGetVideoDeviceNV!: alias function! [
-	dpy             [ Display-ptr! ]
+	dpy             [ XDisplay! ]
 	screen          [ integer! ]
 	numVideoDevices [ integer! ]
 	pVideoDevice    [ GLXVideoDeviceNV-ptr! ]
 	return: [ integer! ]
 ]
 glXGetVideoInfoNV!: alias function! [
-	dpy                     [ Display-ptr! ]
+	dpy                     [ XDisplay! ]
 	screen                  [ integer! ]
 	VideoDevice             [ GLXVideoDeviceNV! ]
 	pulCounterOutputPbuffer [ pointer! [integer!] ]
@@ -1179,18 +1281,18 @@ glXGetVideoInfoNV!: alias function! [
 	return: [ integer! ]
 ]
 glXReleaseVideoDeviceNV!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	screen      [ integer! ]
 	VideoDevice [ GLXVideoDeviceNV! ]
 	return: [ integer! ]
 ]
 glXReleaseVideoImageNV!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	pbuf    [ GLXPbuffer! ]
 	return: [ integer! ]
 ]
 glXSendPbufferToVideoNV!: alias function! [
-	dpy               [ Display-ptr! ]
+	dpy               [ XDisplay! ]
 	pbuf              [ GLXPbuffer! ]
 	iBufferType       [ integer! ]
 	pulCounterPbuffer [ pointer! [integer!] ]
@@ -1216,14 +1318,14 @@ glXSendPbufferToVideoNV!: alias function! [
 
 #define  GLX_OML_sync_control                         1
 glXGetMscRateOML!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	drawable    [ GLXDrawable! ]
 	numerator   [ pointer! [integer!] ]
 	denominator [ pointer! [integer!] ]
 	return: [ logic! ]
 ]
 glXGetSyncValuesOML!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	ust      [ int64-ptr! ]
 	msc      [ int64-ptr! ]
@@ -1231,7 +1333,7 @@ glXGetSyncValuesOML!: alias function! [
 	return: [ logic! ]
 ]
 glXSwapBuffersMscOML!: alias function! [
-	dpy        [ Display-ptr! ]
+	dpy        [ XDisplay! ]
 	drawable   [ GLXDrawable! ]
 	target_msc [ int64-value! ]
 	divisor    [ int64-value! ]
@@ -1239,7 +1341,7 @@ glXSwapBuffersMscOML!: alias function! [
 	return: [ int64-value! ]
 ]
 glXWaitForMscOML!: alias function! [
-	dpy        [ Display-ptr! ]
+	dpy        [ XDisplay! ]
 	drawable   [ GLXDrawable! ]
 	target_msc [ int64-value! ]
 	divisor    [ int64-value! ]
@@ -1250,7 +1352,7 @@ glXWaitForMscOML!: alias function! [
 	return: [ logic! ]
 ]
 glXWaitForSbcOML!: alias function! [
-	dpy        [ Display-ptr! ]
+	dpy        [ XDisplay! ]
 	drawable   [ GLXDrawable! ]
 	target_sbc [ int64-value! ]
 	ust        [ int64-ptr! ]
@@ -1310,14 +1412,14 @@ glXWaitForSbcOML!: alias function! [
 #define  GLX_RGBA_TYPE_SGIX                           8014h
 #define  GLX_COLOR_INDEX_TYPE_SGIX                    8015h
 glXChooseFBConfigSGIX!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	screen      [ integer! ]
 	attrib_list [ pointer! [integer!] ]
 	nelements   [ pointer! [integer!] ]
 	return: [ GLXFBConfigSGIX-ptr! ]
 ]
 glXCreateContextWithConfigSGIX!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	config      [ GLXFBConfig! ]
 	render_type [ integer! ]
 	share_list  [ GLXContext! ]
@@ -1325,25 +1427,25 @@ glXCreateContextWithConfigSGIX!: alias function! [
 	return: [ GLXContext! ]
 ]
 glXCreateGLXPixmapWithConfigSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	config  [ GLXFBConfig! ]
-	pixmap  [ Pixmap! ]
+	pixmap  [ XPixmap! ]
 	return: [ GLXPixmap! ]
 ]
 glXGetFBConfigAttribSGIX!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	config    [ GLXFBConfigSGIX! ]
 	attribute [ integer! ]
 	value     [ pointer! [integer!] ]
 	return: [ integer! ]
 ]
 glXGetFBConfigFromVisualSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	vis     [ XVisualInfo-ptr! ]
 	return: [ GLXFBConfigSGIX! ]
 ]
 glXGetVisualFromFBConfigSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	config  [ GLXFBConfig! ]
 	return: [ XVisualInfo-ptr! ]
 ]
@@ -1365,17 +1467,17 @@ glXGetVisualFromFBConfigSGIX!: alias function! [
 #define  GLX_BAD_HYPERPIPE_SGIX                       92
 #define  GLX_HYPERPIPE_ID_SGIX                        8030h
 glXBindHyperpipeSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	hpId    [ integer! ]
 	return: [ integer! ]
 ]
 glXDestroyHyperpipeConfigSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	hpId    [ integer! ]
 	return: [ integer! ]
 ]
 glXHyperpipeAttribSGIX!: alias function! [
-	dpy        [ Display-ptr! ]
+	dpy        [ XDisplay! ]
 	timeSlice  [ integer! ]
 	attrib     [ integer! ]
 	size       [ integer! ]
@@ -1383,7 +1485,7 @@ glXHyperpipeAttribSGIX!: alias function! [
 	return: [ integer! ]
 ]
 glXHyperpipeConfigSGIX!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	networkId [ integer! ]
 	npipes    [ integer! ]
 	cfg       [ GLXHyperpipeConfigSGIX-ptr! ]
@@ -1391,7 +1493,7 @@ glXHyperpipeConfigSGIX!: alias function! [
 	return: [ integer! ]
 ]
 glXQueryHyperpipeAttribSGIX!: alias function! [
-	dpy              [ Display-ptr! ]
+	dpy              [ XDisplay! ]
 	timeSlice        [ integer! ]
 	attrib           [ integer! ]
 	size             [ integer! ]
@@ -1399,7 +1501,7 @@ glXQueryHyperpipeAttribSGIX!: alias function! [
 	return: [ integer! ]
 ]
 glXQueryHyperpipeBestAttribSGIX!: alias function! [
-	dpy              [ Display-ptr! ]
+	dpy              [ XDisplay! ]
 	timeSlice        [ integer! ]
 	attrib           [ integer! ]
 	size             [ integer! ]
@@ -1408,13 +1510,13 @@ glXQueryHyperpipeBestAttribSGIX!: alias function! [
 	return: [ integer! ]
 ]
 glXQueryHyperpipeConfigSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	hpId    [ integer! ]
 	npipes  [ pointer! [integer!] ]
 	return: [ GLXHyperpipeConfigSGIX-ptr! ]
 ]
 glXQueryHyperpipeNetworkSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	npipes  [ pointer! [integer!] ]
 	return: [ GLXHyperpipeNetworkSGIX-ptr! ]
 ]
@@ -1451,7 +1553,7 @@ glXQueryHyperpipeNetworkSGIX!: alias function! [
 #define  GLX_PBUFFER_SGIX                             8023h
 #define  GLX_BUFFER_CLOBBER_MASK_SGIX                 08000000h
 glXCreateGLXPbufferSGIX!: alias function! [
-	dpy         [ Display-ptr! ]
+	dpy         [ XDisplay! ]
 	config      [ GLXFBConfig! ]
 	width       [ integer! ]
 	height      [ integer! ]
@@ -1459,22 +1561,22 @@ glXCreateGLXPbufferSGIX!: alias function! [
 	return: [ GLXPbuffer! ]
 ]
 glXDestroyGLXPbufferSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	pbuf    [ GLXPbuffer! ]
 ]
 glXGetSelectedEventSGIX!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	mask     [ pointer! [integer!] ]
 ]
 glXQueryGLXPbufferSGIX!: alias function! [
-	dpy       [ Display-ptr! ]
+	dpy       [ XDisplay! ]
 	pbuf      [ GLXPbuffer! ]
 	attribute [ integer! ]
 	value     [ pointer! [integer!] ]
 ]
 glXSelectEventSGIX!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	mask     [ integer! ]
 ]
@@ -1486,12 +1588,12 @@ glXSelectEventSGIX!: alias function! [
 
 #define  GLX_SGIX_swap_barrier                        1
 glXBindSwapBarrierSGIX!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	barrier  [ integer! ]
 ]
 glXQueryMaxSwapBarriersSGIX!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	screen  [ integer! ]
 	max     [ pointer! [integer!] ]
 	return: [ logic! ]
@@ -1504,7 +1606,7 @@ glXQueryMaxSwapBarriersSGIX!: alias function! [
 
 #define  GLX_SGIX_swap_group                          1
 glXJoinSwapGroupSGIX!: alias function! [
-	dpy      [ Display-ptr! ]
+	dpy      [ XDisplay! ]
 	drawable [ GLXDrawable! ]
 	member   [ GLXDrawable! ]
 ]
@@ -1518,14 +1620,14 @@ glXJoinSwapGroupSGIX!: alias function! [
 #define  GLX_SYNC_FRAME_SGIX                          00000000h
 #define  GLX_SYNC_SWAP_SGIX                           00000001h
 glXBindChannelToWindowSGIX!: alias function! [
-	display [ Display-ptr! ]
+	display [ XDisplay! ]
 	screen  [ integer! ]
 	channel [ integer! ]
-	window  [ Window! ]
+	window  [ XWindow! ]
 	return: [ integer! ]
 ]
 glXChannelRectSGIX!: alias function! [
-	display [ Display-ptr! ]
+	display [ XDisplay! ]
 	screen  [ integer! ]
 	channel [ integer! ]
 	x       [ integer! ]
@@ -1535,14 +1637,14 @@ glXChannelRectSGIX!: alias function! [
 	return: [ integer! ]
 ]
 glXChannelRectSyncSGIX!: alias function! [
-	display  [ Display-ptr! ]
+	display  [ XDisplay! ]
 	screen   [ integer! ]
 	channel  [ integer! ]
 	synctype [ GLenum! ]
 	return: [ integer! ]
 ]
 glXQueryChannelDeltasSGIX!: alias function! [
-	display [ Display-ptr! ]
+	display [ XDisplay! ]
 	screen  [ integer! ]
 	channel [ integer! ]
 	x       [ pointer! [integer!] ]
@@ -1552,7 +1654,7 @@ glXQueryChannelDeltasSGIX!: alias function! [
 	return: [ integer! ]
 ]
 glXQueryChannelRectSGIX!: alias function! [
-	display [ Display-ptr! ]
+	display [ XDisplay! ]
 	screen  [ integer! ]
 	channel [ integer! ]
 	dx      [ pointer! [integer!] ]
@@ -1577,8 +1679,8 @@ glXQueryChannelRectSGIX!: alias function! [
 
 #define  GLX_SGI_cushion                              1
 glXCushionSGI!: alias function! [
-	dpy     [ Display-ptr! ]
-	window  [ Window! ]
+	dpy     [ XDisplay! ]
+	window  [ XWindow! ]
 	cushion [ float32! ]
 ]
 
@@ -1592,7 +1694,7 @@ glXGetCurrentReadDrawableSGI!: alias function! [
 	return: [ GLXDrawable! ]
 ]
 glXMakeCurrentReadSGI!: alias function! [
-	dpy     [ Display-ptr! ]
+	dpy     [ XDisplay! ]
 	draw    [ GLXDrawable! ]
 	read    [ GLXDrawable! ]
 	ctx     [ GLXContext! ]
@@ -1634,11 +1736,11 @@ glXWaitVideoSyncSGI!: alias function! [
 
 #define  GLX_SUN_get_transparent_index                1
 glXGetTransparentIndexSUN!: alias function! [
-	dpy               [ Display-ptr! ]
-	overlay           [ Window! ]
-	underlay          [ Window! ]
+	dpy               [ XDisplay! ]
+	overlay           [ XWindow! ]
+	underlay          [ XWindow! ]
 	pTransparentIndex [ pointer! [integer!] ]
-	return: [ Status! ]
+	return: [ XStatus! ]
 ]
 
 
@@ -1650,13 +1752,13 @@ glXGetTransparentIndexSUN!: alias function! [
 #define  GLX_VIDEO_RESIZE_SUN                         8171h
 #define  GL_VIDEO_RESIZE_COMPENSATION_SUN             85CDh
 glXGetVideoResizeSUN!: alias function! [
-	display [ Display-ptr! ]
+	display [ XDisplay! ]
 	window  [ GLXDrawable! ]
 	factor  [ pointer! [float32!] ]
 	return: [ integer! ]
 ]
 glXVideoResizeSUN!: alias function! [
-	display [ Display-ptr! ]
+	display [ XDisplay! ]
 	window  [ GLXDrawable! ]
 	factor  [ float32! ]
 	return: [ integer! ]
