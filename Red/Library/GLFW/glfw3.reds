@@ -46,8 +46,9 @@ Red/System [
 		#define GLFW3_LIBRARY "glfw3.dylib"
 		#define GLFW3_CALLING cdecl
 	] 
-	#default  [;@@ not tested!
-		#define GLFW3_LIBRARY "glfw3.so"
+	#default  [
+		;@@ to install glfw3 on Linux, run this command: sudo apt-get install libglfw3
+		#define GLFW3_LIBRARY "libglfw.so.3"
 		#define GLFW3_CALLING cdecl
 	]
 ]
