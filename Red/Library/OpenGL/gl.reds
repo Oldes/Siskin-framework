@@ -97,8 +97,8 @@ This source was made from glew.h file, which contains these copyrights:
 		#define GL_LIBRARY "/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib"
 		#define GL_CALLING cdecl
 	] 
-	#default  [ ;@@ not tested!
-		#define GL_LIBRARY "/usr/lib/libGL.so.1"
+	#default  [
+		#define GL_LIBRARY "libGL.so"
 		#define GL_CALLING cdecl
 	] 
 ]
