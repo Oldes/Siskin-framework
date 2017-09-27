@@ -24,8 +24,8 @@ Red/System [
 
 #import [LIBC-file cdecl [
 	#either OS = 'Windows [
-		kbhit:   "_kbhit" [ return: [integer!] ]
-		getchar: "_getch" [ return: [integer!] ]
+		kbhit:   "_kbhit"  [ return: [integer!] ]
+		getchar: "_getch"  [ return: [integer!] ]
 	][
 		kbhit:   "kbhit"   [ return: [integer!] ]
 		getchar: "getchar" [ return: [integer!] ]
