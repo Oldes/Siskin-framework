@@ -53,19 +53,33 @@ logic-ptr!:       alias struct! [value [logic!]]
 int64-ptr!:       alias struct! [value [int64-value!]]
 float32-ptr-ptr!: alias struct! [value [float32-ptr!]]
 
-#if OS = 'Windows  [
-	#define HDC!                      handle!
-	#define HGLRC!                    handle!
-	#define HGPUNV!                   handle!
-	#define HPBUFFERARB!              handle!
-	#define HPBUFFEREXT!              handle!
-	#define HPVIDEODEV!               handle!
-	#define HVIDEOINPUTDEVICENV!      handle!
-	#define HVIDEOOUTPUTDEVICENV!     handle!
-	#define PGPU_DEVICE!              handle!
+#switch OS [
+	Windows [
+		#define HDC!                      handle!
+		#define HGLRC!                    handle!
+		#define HGPUNV!                   handle!
+		#define HPBUFFERARB!              handle!
+		#define HPBUFFEREXT!              handle!
+		#define HPVIDEODEV!               handle!
+		#define HVIDEOINPUTDEVICENV!      handle!
+		#define HVIDEOOUTPUTDEVICENV!     handle!
+		#define PGPU_DEVICE!              handle!
 
-	#define HGPUNV-ptr!               handle-ptr!
-	#define HPVIDEODEV-ptr!           handle-ptr!
-	#define HVIDEOINPUTDEVICENV-ptr!  handle-ptr!
-	#define HVIDEOOUTPUTDEVICENV-ptr! handle-ptr!
+		#define HGPUNV-ptr!               handle-ptr!
+		#define HPVIDEODEV-ptr!           handle-ptr!
+		#define HVIDEOINPUTDEVICENV-ptr!  handle-ptr!
+		#define HVIDEOOUTPUTDEVICENV-ptr! handle-ptr!
+	]
+	#default [
+		#define XDisplay!                 handle!
+		#define XWindow!                  handle!
+		#define XPixmap!                  handle!
+		#define XColormap!                handle!
+		#define XCursor!                  handle!
+		#define XVisual!                  handle!
+		#define XGC!                      handle!
+		#define XDrawable!                handle!
+		#define XSizeHints!               handle!
+		#define XAtom!                    handle!
+	]
 ]
